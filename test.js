@@ -22,3 +22,20 @@ test('gets all items and stops', function (t) {
     t.end()
   })
 })
+
+test('works on datos.gob.mx', function (t) {
+  var total = 0
+
+  var searcher = ckan({ uri: 'http://datos.gob.mx/busca/api/' })
+
+  var stream = searcher.stream({fulltext: 'INEGI'})
+  stream.pipe(through.obj(function (data, enc, next) {
+    total += data.result.count
+    next()
+  }))
+
+  stream.on('end', function () {
+    t.true(total > 100, 'finds many datasets from INEGI')
+    t.end()
+  })
+})
